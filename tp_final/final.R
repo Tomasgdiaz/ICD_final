@@ -2,24 +2,33 @@ library(tidyverse)
 library(ggplot2)
 library(forcats)
 library(dplyr)
-library(nycflights13)
 library(ggridges)
-library(lubridate)
+library(modelr)
 premier <- read.csv('C:/Users/master/Desktop/UNSAM/ICD/tp_final/data/EPL_20_21.csv')
 fifa <- read_csv('C:/Users/master/Desktop/UNSAM/ICD/tp_final/data/players_20.csv')
-#elimino columnas
-fifa [, c (1,2,6,11,12,14,17,18,19,20,21,22,23,24,27,28,29,30,31,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,59,60,61,63,64,65,66,67,68,69,70,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104)] <- list (NULL)
-premier1 <- separate(premier, Name, into = c('nombre', 'apellido'), sep = "\\s")
 
-fifa1 <- separate(fifa, short_name, into = c('nombre', 'apellido'), sep = "\\s")
-#uno datasets, pierdo 60 filas pero no pude hacer que se queden
-completo <- left_join(premier1,fifa1, by='apellido') %>% 
-  group_by(apellido) %>% 
-  filter(!duplicated(apellido))
+pmid = filter(premier, Position == "MF"|Position =="MF,FW"|Position=="FW,MF"|Position=="DF,MF"|Position=="MF,DF")
+pmid = filter(pmid, Age>25 & Age<30) 
+ # filter(Perc_Passes_Completed>90)
 
-#Saco valor total de los jugadores para buscar un promedio
-#Al parecer no sirve, por las dudas lo dejo por si necesitamos
-completo$total <-  sum(completo$value_eur, na.rm=TRUE)
-#Dejo solo las columnas de EPL y value_eur
-completo[, c (20,22,23,24,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50)] <- list(NULL)
-completo[, c (21,22)] <- list(NULL)
+#l plot de número de pases en función del número de intentos,
+
+mod1 <- lm(Perc_Passes_Completed~Passes_Attempted, pmid)
+
+grid <- data_grid(pmid,Passes_Attempted)
+
+grid <- add_predictions(pmid, mod1)
+
+#Grafico de los mejores 6 y modelo lineal, DESCOMENTAR LINEA 12
+plot <- ggplot(data=pmid) + 
+  geom_col(aes(x=as.factor(Passes_Attempted), y=Perc_Passes_Completed,fill=Name)) + 
+  labs(title="Modelo lineal ajustado de Edad vs Costo de seguro") + 
+  xlab("Edad") + ylab("Costo de seguro(US$)") + 
+  geom_line(data=grid,aes(x=as.factor(Passes_Attempted),y=pred,group=1),size=1.5)
+plot
+#Grafico de residuos
+ggplot(data =pmid, aes(x = as.factor(Passes_Attempted), 
+                         y = mod1$residuals)) +
+  geom_point(aes(color = mod1$residuals)) +
+  scale_color_gradient2(low = "blue3", mid = "grey", high = "red") +
+  geom_line(size = 0.3) + theme(axis.text.x=element_text(angle=90,vjust=.2,hjust=1))
