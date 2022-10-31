@@ -9,7 +9,7 @@ premier = read.csv("/home/infolab/Descargas/archive/EPL_20_21.csv")
 
 #filtramos por mediocampistas mayores a 25 y menores que 30
 
-pmid = filter(premier, Position == "MF"|Position =="MF,FW"|Position=="FW,MF"|Position=="DF,MF"|Position=="MF,DF")
+pmid = filter(premier, Position == "MF"|Position=="DF,MF"|Position=="MF,DF")
 pmid = filter(pmid, Age>25 & Age<30) 
 
 #agregamos la variable de pases cokçmpletados, multiplicando el porcentaje por los pases intentados
