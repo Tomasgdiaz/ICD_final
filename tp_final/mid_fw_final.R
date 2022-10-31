@@ -7,7 +7,8 @@ premier = read.csv("/home/infolab/Descargas/archive/EPL_20_21.csv")
 
 #||||MEDIOCAMPISTAS||||
 
-#filtramos por mediocampistas mayores a 25 y menores que 30
+#filtramos por mediocampistas mayores a 25 y menores que 30,
+#Mediocampistas, mediocampistas defensivos
 
 pmid = filter(premier, Position == "MF"|Position=="DF,MF"|Position=="MF,DF")
 pmid = filter(pmid, Age>25 & Age<30) 
