@@ -90,4 +90,13 @@ ggplot(delanteros1, aes(Matches, resid)) +
 #||||ARQUEROS||||
 
 #Filtramos por arqueros
-arq = filter(premier, Position=="GK")
+arqueros = filter(premier, Position=="GK")
+
+#Agrego los datos de los goles en contra por equipos "datos sacados de la pagina oficial de la premier league"
+gc =read.csv("C:/Users/RYZEN/Desktop/ICD/Libro1.csv", sep= ";")
+
+#filtro para limpiar a los arqueros con menos de un partido
+arqueros = filter(arqueros, Matches > 1)
+
+#Uno los datasets
+arqueros1 = full_join(arqueros,gc)
