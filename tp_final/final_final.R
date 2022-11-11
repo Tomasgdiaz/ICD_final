@@ -50,9 +50,6 @@ ggplot(pmid1, aes(Passes_Attempted, resid)) +
 delanteros =filter(premier, Position== "FW") %>% 
   filter(Matches>5)
 
-#graficamos los delanteros por goles y partidos
-ggplot(delanteros, aes(Matches, Goals)) + geom_point() 
-
 #agregamos mod y predicciones 
 mod1 = lm(Goals~Matches, data = delanteros)
 
@@ -62,7 +59,7 @@ delanteros1 = delanteros %>%
 #graficamos la regresion lineal
 ggplot(delanteros, aes(x=Matches, y=Goals)) + geom_point() + geom_line(data=delanteros1, aes(y=pred), colour = "red", size = 1)
 
-#como los que tienen mas goles los q tienen mas de 30 partidos
+#como los que tienen mas goles son los q tienen mas de 30 partidos
 delanteros1 = delanteros %>% 
   filter(Matches>30)
 
@@ -123,5 +120,15 @@ arqueros1 = full_join(arqueros,gc)
 ggplot(arqueros1, aes(Matches,GC) ) + geom_point() + geom_text(aes(label=ifelse(arqueros1$GC<35,as.character(Name),'')),hjust=0,vjust=-0.5) + labs(x='Partidos Jugados',
                                                                                                                                                    y='Goles Recibidos',
                                                                                                                                                    title='Partidos Jugados vs Goles en Contra')
+#||LATERALES||
+
+
+#Filtramos defensores, 3000 minutos son 34/38 partidos
+defensores=filter(premier, Position== "DF") %>%
+  filter(Mins>3000, Perc_Passes_Completed>78, Yellow_Cards<10)
+#Grafico y agrego labels, separo por colores la condicion de amonestados
+ggplot(defensores, aes(Perc_Passes_Completed, Mins,color=Yellow_Cards>5)) + geom_point() +
+  geom_text(aes(label=ifelse(Yellow_Cards>0,as.character(Name),'')),hjust=1,vjust=-0.5) +
+  geom_text(aes(label=ifelse(Yellow_Cards<=5,as.character(Yellow_Cards),'')),hjust=-0.5,vjust=-0.5)
 
 
