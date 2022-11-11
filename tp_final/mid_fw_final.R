@@ -85,7 +85,25 @@ delanteros1 = delanteros1 %>%
 ggplot(delanteros1, aes(Matches, resid)) +
   geom_ref_line(h = 0) +
   geom_point()+ geom_text(aes(label=ifelse(delanteros1$resid>9,as.character(Name),'')),hjust=0,vjust=-0.5) 
+                                                 
 
+
+#||||EXTREMOS||||
+
+#Filtramos los extremos, elegimos uno que tenga goles y asistencias
+extremos <- filter(premier,Position=="FW,MF"|Position=="MF,FW"|Position == 'FW',
+               Goals>5,Goals<23, Assists>5)
+extremos <- arrange(extremos, desc(Assists)) %>% 
+  head(n=5)
+
+#Grafico de barras con los extremos (goles y asistencias)
+ggplot(extremos, aes(Goals,Assists, fill=Name)) +
+  geom_col( position='dodge') +
+  geom_text(aes(label=ifelse(extremos$Assists>2,as.character(Name),'')),hjust=+0.4,vjust=0)+ scale_y_continuous(breaks=seq(0, 10, 2))
+
+#grafico de dispersion con asistencias y partidos jugados
+ggplot(extremos, aes(Matches,Assists) ) + geom_point() + geom_text(aes(label=ifelse(Assists>9,as.character(Name),'')),hjust=+0.5,vjust=+2)+xlim(25,40) + scale_y_continuous(breaks=seq(0, 10, 1))
+  
 
 #||||ARQUEROS||||
 
@@ -100,3 +118,10 @@ arqueros = filter(arqueros, Matches > 1)
 
 #Uno los datasets
 arqueros1 = full_join(arqueros,gc)
+
+#Graficamos partidos jugados vs goles en contra
+ggplot(arqueros1, aes(Matches,GC) ) + geom_point() + geom_text(aes(label=ifelse(arqueros1$GC<35,as.character(Name),'')),hjust=0,vjust=-0.5) + labs(x='Partidos Jugados',
+                                                                                                                                                   y='Goles Recibidos',
+                                                                                                                                                   title='Partidos Jugados vs Goles en Contra')
+
+
