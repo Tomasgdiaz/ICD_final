@@ -7,20 +7,20 @@ library(modelr)
 
 premier <-read.csv('C:/Users/master/Desktop/UNSAM/ICD/tp_final/data/EPL_20_21.csv')#||||MEDIOCAMPISTAS||||
 
-#filtramos por mediocampistas mayores a 25 y menores que 30,
+#Filtramos por mediocampistas mayores a 25 y menores que 30,
 #Mediocampistas, mediocampistas defensivos
 
 pmid = filter(premier, Position == "MF"|Position=="DF,MF"|Position=="MF,DF")
 pmid = filter(pmid, Age>25 & Age<30) 
 
-#agregamos la variable de pases cokçmpletados, multiplicando el porcentaje por los pases intentados
+#Agregamos la variable de pases completados, multiplicando el porcentaje por los pases intentados
 pmid1 = mutate(pmid, pases_completados = (Passes_Attempted*Perc_Passes_Completed) /100)
 
-#graficamos los pases intentados por los pases completados
+#Graficamos los pases intentados por los pases completados
 ggplot(pmid1, aes(Passes_Attempted,pases_completados)) + geom_point()
 
 
-#agregamos el mod con las predicciones 
+#Agregamos el mod con las predicciones 
 mod = lm(pases_completados~Passes_Attempted + I(Passes_Attempted^2), data = pmid1)
 
 grid <- pmid1 %>%
@@ -29,26 +29,26 @@ grid <- pmid1 %>%
 grid <- grid %>%
   add_predictions(mod)
 
-#graficamos la regresion lineal
+#Graficamos la regresion lineal
 ggplot(pmid1, aes(x=Passes_Attempted, y=pases_completados)) + geom_point() + geom_line(data=grid, aes(y=pred), colour = "red", size = 1) + 
   labs(x='Pases intentados',
        y='Pases completos',
        title='Pases completos en función de los intentos')
 
-#agregamos los residuos
+#Agregamos los residuos
 pmid1 = pmid1%>%
   add_residuals(mod)
-#filtramos por residuos positivos
+#Filtramos por residuos positivos
 pmid1 = pmid1 %>% 
   filter(resid>0)
-#graficamos los jugadores con residuos positivos
+#Graficamos los jugadores con residuos positivos
 ggplot(pmid1, aes(Passes_Attempted, resid)) +
   geom_ref_line(h = 0) +
   geom_point()+ geom_text(aes(label=ifelse(pmid1$resid>95,as.character(Name),'')),hjust=0,vjust=-0.5) + labs(x='Pases intentados',
                                                                                                              y='Residuos',
                                                                                                              title='Residuos de pases intentados vs pases completos')
 #||DELANTEROS||
-#filtramos por delanteros 
+#Filtramos por delanteros 
 delanteros =filter(premier, Position== "FW") %>% 
   filter(Matches>5)
 #SACO A KANE DEL LM
@@ -65,46 +65,46 @@ ggplot(delanteros, aes(x=Matches, y=Goals)) + geom_point() + geom_line(data=del_
        title='Goles por partidos',
        subtitle= 'Modelo sin Harry Kane')
 
-#graficamos los delanteros por goles y partidos
+#Graficamos los delanteros por goles y partidos
 ggplot(delanteros, aes(Matches, Goals)) + geom_point() 
 
-#agregamos mod y predicciones 
+#Agregamos mod y predicciones 
 mod1 = lm(Goals~Matches, data = delanteros)
 
 delanteros1 = delanteros %>% 
   add_predictions(mod1)
 
-#graficamos la regresion lineal
+#Graficamos la regresion lineal
 ggplot(delanteros, aes(x=Matches, y=Goals)) + geom_point() + geom_line(data=delanteros1, aes(y=pred), colour = "red", size = 1) +
   labs(x='Partidos',
        y='Goles',
        title='Goles por partidos',
        subtitle= 'Modelo con Harry Kane')
 
-#como los que tienen mas goles los q tienen mas de 30 partidos
+#Como los que tienen mas goles los que tienen mas de 30 partidos
 delanteros1 = delanteros %>% 
   filter(Matches>30)
 
-#agregamos el nuevo mod con las predicciones con los delanteros mayores a 30
+#Agregamos el nuevo mod con las predicciones con los delanteros mayores a 30
 mod2 = lm(Goals~Matches, data = delanteros1)
 
 delanteros1 = delanteros1 %>% 
   add_predictions(mod2)
 
-#graficamos la regresion lineal con los delanteros mayores a 30
+#Graficamos la regresion lineal con los delanteros mayores a 30
 ggplot(delanteros1, aes(x=Matches, y=Goals)) + geom_point() + geom_line(data=delanteros1, aes(y=pred), colour = "red", size = 1) + geom_text(aes(label=ifelse(delanteros1$Goals>20,as.character(Name),'')),hjust=0.5,vjust=-0.5) +
   labs(x='Partidos',
        y='Goles',
        title='Goles por partidos (zoom)',
        subtitle= 'Modelo teniendo en cuenta a Harry Kane')
 
-#agregamos los residuos
+#Agregamos los residuos
 delanteros1 = delanteros1%>%
   add_residuals(mod2)
 delanteros1 = delanteros1 %>% 
   filter(resid>0)
 
-#graficamos los residuos de los delanteros
+#Graficamos los residuos de los delanteros
 ggplot(delanteros1, aes(Matches, resid)) +
   geom_ref_line(h = 0) +
   geom_point()+ geom_text(aes(label=ifelse(delanteros1$resid>9,as.character(Name),'')),hjust=0,vjust=-0.5) + labs(x='Partidos',
@@ -155,7 +155,7 @@ arqueros = filter(premier, Position=="GK")
 #Agrego los datos de los goles en contra por equipos "datos sacados de la pagina oficial de la premier league"
 gc =read.csv("C:/Users/RYZEN/Desktop/ICD/Libro1.csv", sep= ";")
 
-#filtro para limpiar a los arqueros con menos de un partido
+#Filtro para limpiar a los arqueros con menos de un partido
 arqueros = filter(arqueros, Matches > 1)
 
 #Uno los datasets
